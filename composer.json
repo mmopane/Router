@@ -1,0 +1,19 @@
+{
+    "name": "mmopane/router",
+    "description": "A simple routing",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "MMOPANE\\Router\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mmopane"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    }
+}
