@@ -14,6 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0"
+        "php": ">=8.0",
+        "mmopane/collection": "^1.0"
     }
 }
