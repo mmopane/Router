@@ -33,7 +33,7 @@ class RouteMatcher
         if($routes->isEmpty())
             throw new NotFoundException();
 
-        $routes = $this->routes->filter(fn (Route $route) => $route->hasMethods($method));
+        $routes = $routes->filter(fn (Route $route) => $route->hasMethods($method));
 
         if($routes->isEmpty())
             throw new MethodNotAllowedException();
