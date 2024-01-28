@@ -2,20 +2,21 @@
 
 namespace MMOPANE\Router;
 
+use MMOPANE\Collection\Collection;
 use MMOPANE\Router\Exception\MethodNotAllowedException;
 use MMOPANE\Router\Exception\NotFoundException;
 
 class RouteMatcher
 {
     /**
-     * @var RouteCollection
+     * @var Collection<string, Route>
      */
-    protected RouteCollection $routes;
+    protected Collection $routes;
 
     /**
-     * @param RouteCollection $routes
+     * @param Collection<string, Route> $routes
      */
-    public function __construct(RouteCollection $routes)
+    public function __construct(Collection $routes)
     {
         $this->routes = $routes;
     }
@@ -27,22 +28,27 @@ class RouteMatcher
      */
     public function match(string $uri, string $method): RouteMatch
     {
-        $route = $this->routes->findByURI($uri);
+        $routes = $this->routes->filter(fn (Route $route) => preg_match($route->getRegex(), $uri));
 
-        if(is_null($route))
+        if($routes->isEmpty())
             throw new NotFoundException();
 
-        if(!$route->hasMethods($method))
+        $routes = $this->routes->filter(fn (Route $route) => $route->hasMethods($method));
+
+        if($routes->isEmpty())
             throw new MethodNotAllowedException();
+
+        /** @var Route $route */
+        $route = $routes->first();
 
         $uriSegments = explode('/', '/' . trim($uri, '/'));
         $pathSegments = explode('/', $route->getPath());
-        $arguments = [];
+        $arguments = new Collection();
 
         foreach ($pathSegments as $index => $pathSegment)
         {
             if(preg_match('^\{[a-zA-Z_]+}$^', $pathSegment))
-                $arguments[trim($pathSegment, '{}')] = $uriSegments[$index];
+                $arguments->put(trim($pathSegment, '{}'), $uriSegments[$index]);
         }
 
         return new RouteMatch($route, $arguments);

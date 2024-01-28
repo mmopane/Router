@@ -2,6 +2,8 @@
 
 namespace MMOPANE\Router;
 
+use MMOPANE\Collection\Collection;
+
 class RouteMatch
 {
     /**
@@ -10,18 +12,18 @@ class RouteMatch
     protected Route $route;
 
     /**
-     * @var array
+     * @var Collection<array-key, mixed>
      */
-    protected array $arguments;
+    protected Collection $arguments;
 
     /**
      * @param Route $route
-     * @param array $arguments
+     * @param Collection<array-key, mixed> $arguments
      */
-    public function __construct(Route $route, array $arguments = [])
+    public function __construct(Route $route, Collection $arguments)
     {
-        $this->route        = $route;
-        $this->arguments    = $arguments;
+        $this->route = $route;
+        $this->arguments = $arguments;
     }
 
     /**
@@ -33,9 +35,9 @@ class RouteMatch
     }
 
     /**
-     * @return array
+     * @return Collection<array-key, mixed>
      */
-    public function getArguments(): array
+    public function getArguments(): Collection
     {
         return $this->arguments;
     }

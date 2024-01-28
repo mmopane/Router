@@ -2,17 +2,19 @@
 
 namespace MMOPANE\Router;
 
+use MMOPANE\Collection\Collection;
+
 class Router
 {
     /**
-     * @var RouteCollection
+     * @var Collection<string, Route>
      */
-    protected RouteCollection $routes;
+    protected Collection $routes;
 
     /**
-     * @param RouteCollection $routes
+     * @param Collection $routes
      */
-    public function __construct(RouteCollection $routes)
+    public function __construct(Collection $routes)
     {
         $this->routes = $routes;
     }
@@ -25,7 +27,9 @@ class Router
      */
     public function add(string $name, string $path, callable|array $handler): Route
     {
-        return $this->routes->add($name, new Route($name, $path, $handler));
+        $route = new Route($name, $path, $handler);
+        $this->routes->put($name, $route);
+        return $route;
     }
 
     /**
@@ -51,9 +55,9 @@ class Router
     }
 
     /**
-     * @return RouteCollection
+     * @return Collection<string, Route>
      */
-    public function getRoutes(): RouteCollection
+    public function getRoutes(): Collection
     {
         return $this->routes;
     }

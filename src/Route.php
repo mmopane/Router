@@ -2,6 +2,8 @@
 
 namespace MMOPANE\Router;
 
+use MMOPANE\Collection\Collection;
+
 class Route
 {
     /**
@@ -15,9 +17,9 @@ class Route
     protected string $path;
 
     /**
-     * @var array
+     * @var Collection<array-key, string>
      */
-    protected array $methods = [];
+    protected Collection $methods;
 
     /**
      * @var RouteHandler
@@ -25,9 +27,9 @@ class Route
     protected RouteHandler $handler;
 
     /**
-     * @var array
+     * @var Collection<array-key, RouteHandler>
      */
-    protected array $middlewares = [];
+    protected Collection $middlewares;
 
     /**
      * @var string
@@ -44,6 +46,8 @@ class Route
         $this->setName($name);
         $this->setPath($path);
         $this->setHandler($handler);
+        $this->methods = new Collection();
+        $this->middlewares = new Collection();
     }
 
     /**
@@ -92,35 +96,30 @@ class Route
     }
 
     /**
-     * @param ...$methods
+     * @param string ...$methods
      * @return $this
      */
-    public function setMethods(...$methods): self
+    public function setMethods(string ...$methods): self
     {
-        $this->methods = array_map('mb_strtoupper', $methods);
+        $this->methods = new Collection(array_map('mb_strtoupper', $methods));
         return $this;
     }
 
     /**
-     * @return array
+     * @return Collection<array-key, string>
      */
-    public function getMethods(): array
+    public function getMethods(): Collection
     {
         return $this->methods;
     }
 
     /**
-     * @param ...$methods
+     * @param string ...$methods
      * @return bool
      */
-    public function hasMethods(...$methods): bool
+    public function hasMethods(string ...$methods): bool
     {
-        foreach ($methods as $method)
-        {
-            if(!in_array(mb_strtoupper($method), $this->methods))
-                return false;
-        }
-        return true;
+        return $this->methods->has($methods);
     }
 
     /**
@@ -147,14 +146,14 @@ class Route
      */
     public function addMiddleware(array|callable $handler): self
     {
-        $this->middlewares[] = new RouteHandler($handler);
+        $this->middlewares->add(new RouteHandler($handler));
         return $this;
     }
 
     /**
-     * @return array<RouteHandler>
+     * @return Collection<array-key, RouteHandler>
      */
-    public function getMiddlewares(): array
+    public function getMiddlewares(): Collection
     {
         return $this->middlewares;
     }

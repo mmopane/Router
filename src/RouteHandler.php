@@ -2,6 +2,11 @@
 
 namespace MMOPANE\Router;
 
+use MMOPANE\Collection\Collection;
+use MMOPANE\Router\Exception\ClassNotFoundException;
+use MMOPANE\Router\Exception\HandlerNotValidException;
+use MMOPANE\Router\Exception\MethodNotFoundException;
+
 class RouteHandler
 {
     /**
@@ -10,14 +15,14 @@ class RouteHandler
     protected mixed $handler;
 
     /**
-     * @var array
+     * @var Collection<array-key, mixed>
      */
-    protected array $constructorParams = [];
+    protected Collection $constructorParams;
 
     /**
-     * @var array
+     * @var Collection<array-key, mixed>
      */
-    protected array $methodParams  = [];
+    protected Collection $methodParams;
 
     /**
      * @param callable|array $handler
@@ -25,25 +30,27 @@ class RouteHandler
     public function __construct(callable|array $handler)
     {
         $this->handler = $handler;
+        $this->constructorParams = new Collection();
+        $this->methodParams = new Collection();
     }
 
     /**
-     * @param mixed ...$parameters
+     * @param mixed $parameter
      * @return $this
      */
-    public function setConstructorParams(mixed ...$parameters): self
+    public function addConstructorParam(mixed $parameter): self
     {
-        $this->constructorParams = $parameters;
+        $this->constructorParams->add($parameter);
         return $this;
     }
 
     /**
-     * @param mixed ...$parameters
+     * @param mixed $parameter
      * @return $this
      */
-    public function setMethodParams(mixed ...$parameters): self
+    public function addMethodParam(mixed ...$parameter): self
     {
-        $this->methodParams = $parameters;
+        $this->methodParams->add($parameter);
         return $this;
     }
 
@@ -53,15 +60,15 @@ class RouteHandler
     public function execute(): mixed
     {
         if(is_callable($this->handler))
-            return call_user_func($this->handler, ...$this->methodParams);
+            return call_user_func($this->handler, ...$this->methodParams->all());
 
         if(!is_array($this->handler))
-            throw new \RuntimeException('Handler is not valid');
+            throw new HandlerNotValidException();
         if(!class_exists($this->handler[0]))
-            throw new \RuntimeException('Class not found');
+            throw new ClassNotFoundException();
         if(!method_exists($this->handler[0], $this->handler[1]))
-            throw new \RuntimeException('Method not found');
+            throw new MethodNotFoundException();
 
-        return (new $this->handler[0](...$this->constructorParams))->{$this->handler[1]}(...$this->methodParams);
+        return (new $this->handler[0](...$this->constructorParams->all()))->{$this->handler[1]}(...$this->methodParams->all());
     }
 }
