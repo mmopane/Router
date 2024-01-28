@@ -119,7 +119,7 @@ class Route
      */
     public function hasMethods(string ...$methods): bool
     {
-        return $this->methods->has($methods);
+        return $this->methods->in(...array_map('mb_strtoupper', $methods));
     }
 
     /**

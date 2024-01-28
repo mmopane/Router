@@ -12,11 +12,11 @@ class Router
     protected Collection $routes;
 
     /**
-     * @param Collection $routes
+     * @param Collection|null $routes
      */
-    public function __construct(Collection $routes)
+    public function __construct(Collection $routes = null)
     {
-        $this->routes = $routes;
+        $this->routes = $routes ?? new Collection();
     }
 
     /**
