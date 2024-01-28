@@ -48,7 +48,7 @@ class RouteHandler
      * @param mixed $parameter
      * @return $this
      */
-    public function addMethodParam(mixed ...$parameter): self
+    public function addMethodParam(mixed $parameter): self
     {
         $this->methodParams->add($parameter);
         return $this;
